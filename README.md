@@ -8,15 +8,20 @@
 Place 2 projects side by side in remote server $HOME like the following
 /home/pbb
          /certbot
-         /web-application
+         /valuation-table
 
 
-* Start docker-compose deployment on the remote server (docker-compose up --build -d)
+
 * Go to http://cloudhelp.ca to check index.html showing up
 
-## Generate Certificate
-Test command with --staging argument, then remove to generate actual certificates 
+## Generate Certificates 
+ * Start certbot deployment on the remote server (docker-compose up --build -d)
+ * If you have issues with certbot server, try displaying the public/index.html file
+ 
+ -- Note -- Test command with --staging argument, then remove to generate actual certificates 
 ```shell
+export APPLICATION_PATH=$HOME/valuation-table
+
 sudo docker run -it --rm -v /docker-volumes/certbot/etc/letsencrypt:/etc/letsencrypt \
 -v /docker-volumes/certbot/var/lib/letsencrypt:/var/lib/letsencrypt \
 -v /docker-volumes/certbot/var/log/letsencrypt:/var/log/letsencrypt \
@@ -26,16 +31,27 @@ certbot/certbot certonly --webroot --register-unsafely-without-email --agree-tos
 -d cloudhelp.ca -d www.cloudhelp.ca 
 ```
 
-
-
-## Ajustments
-
-### Generate dh file if needed 
+## Generate dh file if needed
 
 ```shell
-sudo openssl dhparam -out /$HOME/web-application/dh-param/dhparam-2048.pem 2048
+sudo openssl dhparam -out $APPLICATION_PATH/docker/dhparam-2048.pem 2048
 ```
 
-## TODO
-This is where is gets tricky to deal with certificates outside of deployment scope
-@see readme for valuation
+## Move files and change permissions
+
+```shell
+sudo cp /docker-volumes/certbot/etc/letsencrypt/live/cloudhelp.ca/fullchain.pem $APPLICATION_PATH/docker/fullchain.pem
+sudo cp /docker-volumes/certbot/etc/letsencrypt/live/cloudhelp.ca/privkey.pem $APPLICATION_PATH/docker/privkey.pem
+sudo chmod 0644 \
+$APPLICATION_PATH/docker/fullchain.pem \
+$APPLICATION_PATH/docker/privkey.pem \
+$APPLICATION_PATH/docker/dhparam-2048.pem
+sudo chown pbb: \
+$APPLICATION_PATH/docker/fullchain.pem \
+$APPLICATION_PATH/docker/privkey.pem \
+$APPLICATION_PATH/docker/dhparam-2048.pem
+```
+
+## TODOs && Ajustments
+1. Find a way to improve deployment (not having to move files manually, change permissions and etc. )
+2. Renew certificate
