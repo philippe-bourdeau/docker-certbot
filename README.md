@@ -2,21 +2,18 @@
 * git -- to upload code to your server (or you could scp code to remote instead)
 * docker
 * docker-compose
+* reference https://www.humankode.com/ssl/how-to-set-up-free-ssl-certificates-from-lets-encrypt-using-docker-and-nginx
 
-## Project structure : 
-
-Place 2 projects side by side in remote server $HOME like the following
+## Deployment structure :
+* Certificates and related files will be generated in /docker-volumes/ 
+* Place 2 projects side by side in remote server $HOME like the following (scp or git to get the code)
 /home/pbb
          /certbot
          /valuation-table
 
-
-
-* Go to http://cloudhelp.ca to check index.html showing up
-
 ## Generate Certificates 
  * Start certbot deployment on the remote server (docker-compose up --build -d)
- * If you have issues with certbot server, try displaying the public/index.html file
+ * If you have issues with certbot server, try displaying the public/index.html (http://cloudhelp.ca)
  
  -- Note -- Test command with --staging argument, then remove to generate actual certificates 
 ```shell
